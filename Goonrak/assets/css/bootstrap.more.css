@@ -1,0 +1,11 @@
+@charset "utf-8";
+body, input, button, select, textarea { font-family: "Helvetica Neue", Helvetica, Arial, NanumGothic, 나눔고딕, Dotum, 돋움, sans-serif; }
+.container { padding: 30px 0; max-width: 800px; }
+.jumbotron { margin: 50px 0; text-align: center; }
+.jumbotron h1 { font-size: 80px; line-height: 1; }
+.jumbotron p { font-size: 24px; line-height: 1.25; margin-top: 20px; }
+.span4 { text-align: center; margin-bottom: 60px; }
+.span6 { text-align: center; margin-bottom: 60px; }
+.span12 { text-align: center; margin-bottom: 60px; }
+footer { text-align: center; }
+h2, h3 { margin-top: 40px; }

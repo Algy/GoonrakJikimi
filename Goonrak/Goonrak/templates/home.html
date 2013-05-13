@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<body>
+
+<div class="container">
+    <div class="jumbotron">
+        <h1>The Goonrak</h1>
+        <p>Wargame presented by Guardian</p>
+    </div>
+    <ul class="row-fluid">
+        <li class="span4">
+            <a href="#" class="thumbnail">
+                <img src="holder.js/300x200" alt="">
+            </a>
+            <h4>Studies</h4>
+        </li>
+        <li class="span4">
+            <a href="#" class="thumbnail">
+                <img src="holder.js/300x200" alt="">
+            </a>
+            <h4>Practices</h4>
+        </li>
+        <li class="span4">
+            <a href="#" class="thumbnail">
+                <img src="holder.js/300x200" alt="">
+            </a>
+            <h4>Scoreboard</h4>
+        </li>
+    </ul>
+    {% if user.username %}
+    <div class="row-fluid">
+        <div class="span12">
+            <p>Welcome to Goonrak, {{ user.username }}</p>
+            <a class="btn btn-small btn-primary" href="/accounts/logout">Logout</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="row-fluid">
+        <div class="span6">
+            <a class="btn btn-large btn-primary" href="/accounts/login">Login</a>
+        </div>
+        <div class="span6">
+            <a class="btn btn-large btn-success" href="/accounts/register/">Register</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+{% endblock %}
