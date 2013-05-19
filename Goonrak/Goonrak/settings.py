@@ -42,7 +42,7 @@ USE_I18N = True
 USE_L10N = True
 
 # If you set this to False, Django will not use timezone-aware datetimes.
-USE_TZ = True
+USE_TZ = True # enable this?(for PsyChat app)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
@@ -57,7 +57,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(os.path.dirname(__file__),'..').replace('\\','/')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -65,7 +65,8 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    ('assets', os.path.join(os.path.dirname(__file__),'..','static').replace('\\','/')),
+    ('assets', 'static'),
+    ('psychat_assets', 'PsyChat/static'),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -104,10 +105,11 @@ ROOT_URLCONF = 'Goonrak.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'Goonrak.wsgi.application'
 
-import os
+
 TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(__file__), '.', 'templates').replace('\\','/'),
+    os.path.join(os.path.dirname(__file__), '.', 'templates').replace('\\','/'), 
     os.path.join(os.path.dirname(__file__), '..', 'templates').replace('\\','/'),
+    os.path.join(os.path.dirname(__file__), '..', 'PsyChat', 'templates').replace('\\','/'),
 )
 
 INSTALLED_APPS = (
@@ -122,7 +124,11 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'Problems',
+    'PsyChat', 
 )
+
+#do not maintain session when browser closed
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
