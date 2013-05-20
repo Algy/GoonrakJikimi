@@ -1,5 +1,8 @@
 eclipse.preferences.version=1
-encoding//Goonrak/PsyChat/bot.py=utf-8
+encoding//Goonrak/PsyChat/CrawlerManager.py=utf-8
+encoding//Goonrak/PsyChat/IRCCrawler.py=utf-8
 encoding//Goonrak/PsyChat/config.py=utf-8
-encoding//Goonrak/PsyChat/views.py=UTF-8
+encoding//Goonrak/PsyChat/views.py=utf-8
 encoding//Goonrak/irclib/ircbot.py=utf-8
+encoding//Goonrak/irclib/irclib.py=utf-8
+encoding//Goonrak/templates/base.html=UTF-8

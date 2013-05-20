@@ -1,18 +1,13 @@
-<!-- AUTHOR : sim0629 -->
-<!-- XML FOR AJAX OUTPUT-->
 <?xml version="1.0" encoding="utf-8"?>
 <result transition_id="{{ transition_id }}" status="{{ status }}">
     {% for log in logs %}
         <log>
-            
-            <datetime><![CDATA[{{ log.datetime }}]]></datetime>
+            <datetime><![CDATA[{{ log.timestamp|date:"Y-m-d H:i:s" }}]]></datetime>
             <source><![CDATA[{{ log.source }}]]></source>
-            <message><![CDATA[{{ log.message }}]]></message>
-            <!-- it's for ircbot and kakao bot  -->
-            <sendState><![CDATA[{{ log.sendState }}]]></sendState>
-            <msgType><![CDATA[{{ log.msgType }} ]]></msgType>
-            <group><![CDATA[{{ log.group }} ]]></group>
-            
+            <message><![CDATA[{{ log.content }}]]></message>
+            <channel><![CDATA[{{ log.channel }}]]></channel>
+            <msgType><![CDATA[{{ log.msgType }}]]></msgType>
+            <group><![CDATA[{{ log.group }}]]></group>
         </log>
     {% endfor %}
 </result>

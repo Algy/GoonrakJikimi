@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-from PsyChat.models import PSYCHAT_MSGTYPE_SYSTEM, PSYCHAT_MSGTYPE_NORMAL, BotSend, PSYCHAT_BOT_SENT, Chat, PSYCHAT_BOT_RESPONSE, PSYCHAT_GROUP_URIIRC, PSYCHAT_BOT_SEND_READY
-from irclib import ircbot, irclib
+from PsyChat.models import PSYCHAT_MSGTYPE_SYSTEM, PSYCHAT_MSGTYPE_NORMAL, \
+    BotSend, PSYCHAT_BOT_SENT, Chat, PSYCHAT_BOT_RESPONSE, PSYCHAT_GROUP_URIIRC, \
+    PSYCHAT_BOT_SEND_READY
+from crawler import Crawler
 from datetime import datetime
+from irclib import ircbot, irclib
+import collections
 import config
-import md5
-import re
 
-class SBot(ircbot.SingleServerIRCBot):
-    botGroup = PSYCHAT_GROUP_URIIRC
+
+
+class SBot(ircbot.SingleServerIRCBot, Crawler):
     joinChannels = ["#Algy", ]
     def __init__(self):
         
@@ -16,8 +19,10 @@ class SBot(ircbot.SingleServerIRCBot):
             config.BOT_NAME,
             'm',
         )
-        
+        Crawler.__init__(self)
+        self.botGroup = PSYCHAT_GROUP_URIIRC
         self.connected = False
+        self.msgQueue = collections.deque()
         self._fetch()
     ''' 
     event handler part
@@ -27,6 +32,7 @@ class SBot(ircbot.SingleServerIRCBot):
         for target in self.joinChannels: #extract last channels the user used
             print "target : " + target
             c.join(target) #==self.connect.join(target)
+            
     
     def on_mode(self, c, e):
         nick = irclib.nm_to_n(e.source())
@@ -77,46 +83,37 @@ class SBot(ircbot.SingleServerIRCBot):
     function part
     '''        
             
-    def formatMessage(self, source, message):
-        return '<%s> %s' % (source, message)
-    
-    def deformatMessage(self, message):
-        m = re.match(r"^<.+> ", message)
-        if not m:
-            return None
-        
-        print "deformats : " + message[m.end() : ]
-        return message[ m.end() : ]
-    
-    def sentFilter(self, source, message, msgType):
-        if source == config.BOT_NAME:
-            splittedMessage = self.deformatMessage( message )
-            if not splittedMessage:
-                return 
-            md5_obj = md5.new()
-            md5_obj.update(splittedMessage)
-            return md5_obj.hexdigest()
-        return 
+
     # vary by using another db or saving system
     def _log(self, target, source, message, msgType):
         
         print  "@"+target + " "+ "<" + source + ">" + message
+        
         # first, filter if it was sent by bot 
+        isEcho = False
+        '''
         hexDigest = self.sentFilter(source, message, msgType) # if it is assummed redrawed message
         
-        if hexDigest: # it's sent by bot
+        
+        
+        if hexDigest: # it's sent by bot(echo)
             print "it has been sent ever..."
             sentArray = BotSend.objects.filter(md5digest = hexDigest).filter(status = PSYCHAT_BOT_SENT).order_by('sent_timestamp') 
             
             if len(sentArray) == 0:
                 pass # may be it's fake
             else:
+                isEcho = True
+                
                 sentRecord = sentArray[0]; 
                 sentRecord.responsed_timestamp = datetime.now()
                 sentRecord.status = PSYCHAT_BOT_RESPONSE
                 sentRecord.save()
+    '''
+        if not isEcho:
             
-        else:
+            self.notifyChatMessage(channel = target, source = source, message = message, msgType = msgType)
+            '''
             record = Chat(timestamp = datetime.now(), 
                           source = source, 
                           channel = target, 
@@ -124,45 +121,36 @@ class SBot(ircbot.SingleServerIRCBot):
                           msgType = msgType, 
                           content = message);
             record.save()
-            
+            '''
     
     
     def _fetch(self):
         if self.connected:
             try:
-                for record in BotSend.objects.filter( status = PSYCHAT_BOT_SEND_READY ):
-                    channel = record.ref_chat.channel.lower().encode('utf-8').lower()
+                save_record = None
+                while len(self.msgQueue) > 0: # BotSend.objects.filter(bot_group = self.bot).filter( status = PSYCHAT_BOT_SEND_READY ):
+                    record = self.msgQueue.popleft()
+                    save_record = record
+                    channel = record['channel']#.lower().encode('utf-8').lower()
+                    account = record['source']#.encode('utf-8')
+                    message = self.formatMessage(account, record['content'], record['msgType']).encode('utf-8')
                     
-                    if channel not in self.channels:
-                        self.connection.join(channel)
-                    account = record.ref_chat.source.encode('utf-8')
+                    for channel in self.joinChannels:
+                        self.connection.privmsg(channel, message) 
                     
-                    message = self.formatMessage(account, record.ref_chat.content ).encode('utf-8')
-                    self.connection.privmsg(channel, message) 
-                    
-                    record.sent_timestamp = datetime.now() # sucess!:)
-                    record.save()
+                    self.notifySendSuccess(record)
                     
             except irclib.ServerNotConnectedError:
+                if save_record:
+                    self.msgQueue.appendleft(save_record)
                 self.connected = False
                 self._connect()
-                
-        print "fetched.."
+        
         self.ircobj.execute_delayed(1, self._fetch) 
-        
     
-    def queueMsg(self, chatRecord):
-        content = chatRecord.content
-        md5_obj = md5.new()
-        md5_obj.update(content)
+    def enqueueMessage(self, chatRecord):
+        self.msgQueue.append(chatRecord)
         
-        sendRecord = BotSend(queued_timestamp = datetime.now(), 
-                status = PSYCHAT_BOT_SEND_READY,
-                md5digest = md5_obj.hexdigest(),
-                bot_group = self.botGroup,
-                ref_chat = chatRecord
-                );
-        sendRecord.save()
         
 if __name__ == '__main__':
     bot = SBot()

@@ -158,3 +158,10 @@ LOGGING = {
         },
     }
 }
+
+
+'''
+Psychat setting
+'''
+#PSYCHAT_CRAWLER_MANAGER = CrawlerManager()
+PSYCHAT_CRAWLER_MANAGER = None

@@ -1,16 +1,19 @@
-﻿{% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset='utf-8'> 
     <title>The Goonrak</title>
     <link rel="stylesheet" type="text/css" href="{% static "assets/css/bootstrap.min.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "assets/css/bootstrap.more.css" %}">
     <script src="{% static "assets/js/bootstrap.min.js" %}"></script>
     <script src="{% static "assets/js/holder.js" %}"></script>
+    <script src="{% static "assets/js/jquery-1.9.1.js" %}"></script>
 </head>
 {% block content %}
 {% endblock %}
 <footer>
-    <p>Guardian은 서울대학교 컴퓨터공학부의 해킹/보안 동아리입니다.</p>
+<!-- 인코딩 깨져서 새로 타이핑함 ㅠㅠ-->
+    <p>Guardian은 서울대학교 컴퓨터공학부 정보보안연구 동아리입니다.</p>
 </footer>
 </html>

@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+    <title>PsyChat </title>
+    <link rel="stylesheet" type="text/css" href="{% static "assets/css/bootstrap.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "assets/css/bootstrap.more.css" %}">
+    <script src="{% static "assets/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "assets/js/holder.js" %}"></script>
+    <script src="{% static "assets/js/jquery-1.9.1.js" %}"></script>
+    <script>
+    	var algy_last_update = '';
+    	var algy_last_downdate = '';
+    	
+    	var algy_send = function() {
+    		var message = $('#message_input').val();
+    		if(message.length == 0) return false;
+    		$.ajax({
+    			type: "GET",
+    			url: "send/",
+    			data: "message=" + encodeURIComponent(message),
+    			dataType:"xml",
+    			success : function(data, status, xhr) {
+    			algy_add_process(data, 'send');
+    			},
+    			error: function(xhr, status, err) {
+    				alert( status + err);
+    			} 
+    		});
+    		
+    		$('input#message_input').val("");
+    		
+    	}
+    	
+    	var algy_datetime_now = function() {
+    		var d, res;
+    		d = new Date();
+    		return res = "" + (d.getFullYear()) + "-" + (d.getMonth() + 1) + "-" + (d.getDate()) + " " + (d.getHours()) + ":" + (d.getMinutes()) + ":" + (d.getSeconds());
+		};
+		
+    	var algy_append_log = function(flag, datetime, source, message) {
+    		var element = $('<li>' + '(' + datetime + ')' + '&lt;' + source + '&gt;' + ' ' + message + '</li>');
+   			
+    		if(flag == 'downdate') {
+    			element.prependTo($('ul#chat_view')).attr('flag', flag);
+    		} else {
+    			if(flag != 'send') {
+    				algy_last_update = datetime;
+    			}
+    			element.appendTo($('ul#chat_view')).attr('flag', flag);
+    		}
+    		
+    	};
+    	var algy_update = function() {
+    		$.ajax({
+    			type: "GET",
+    			url: "update/",
+    			data: "last_update=" + encodeURIComponent(algy_last_update),
+    			dataType:"xml",
+    			success : function(data, status, xhr) {
+    				algy_add_process(data, 'update');
+    				$('ul#chat_view > li[flag="send"]').remove(); // for UX
+    				setTimeout(algy_update, 500);
+    			},
+    			error: function(xhr, status, err) {
+    				alert( status + err);
+    				
+    				setTimeout(algy_update, 2000);
+    				
+    			} 
+    		});
+    		return false;
+    	};
+    	var algy_downdate = function () {
+    		$.ajax({
+    			type: "GET",
+    			url: "downdate/",
+    			data: "last_downdate=" + encodeURIComponent(algy_last_downdate),
+    			dataType:"xml",
+    			success : function(data, status, xhr) {
+    				algy_add_process(data, 'downdate');
+    			},
+    			error: function(xhr, status, err) {
+    				alert( status + err);
+    			} 
+    		});    		
+    	};
+    	var algy_add_process = function (xml, flag) { 
+    		$('log', xml).each(function(i) {
+    			var datetime = $(this).find('datetime').text();
+    			var source = $(this).find('source').text();
+    			var message = $(this).find('message').text();
+    			algy_append_log(flag, datetime, source, message);
+    		});
+    	};
+    	var algy_init = function() {
+		    try 
+		    {
+	    		algy_last_update = algy_last_downdate = algy_datetime_now();
+	    		algy_downdate();
+	    		setTimeout("algy_update();", 2000);
+	    		return false;
+		    }
+		    catch(_err)
+		    {
+		    	alert(_err.message);
+		    }
+    	};
+    	
+    	$(document).ready( function() {
+    		$('#message_send_form').submit(function() { algy_send(); } );
+    		algy_init();
+    	});
+    	
+    </script>
+</head>
+
+<body>
+<ul id="chat_view">
+	<li group=1>goorak test</li>
+</ul>
+
+<form id="message_send_form" method="post" onsubmit="return false;">
+<input type="text" id="message_input"></input>
+</form>
+
+</body>
+
+
+</html>
