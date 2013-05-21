@@ -9,8 +9,7 @@ class MyRegisterationForm(UserCreationForm):
         model=User
         fields=('username','email','password1','password2')
     def save(self, commit=True):
-        user=super(UserCreationForm, self).save(commit=False)
-        user.email=self.cleaned_data['email']
+	user = User.objects.create_user(self.cleaned_data['username'],self.cleaned_data['email'],self.cleaned_data['password1'])
         if commit:
             user.save()
         return user
