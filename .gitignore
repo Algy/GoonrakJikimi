@@ -1,7 +1,7 @@
-*~
 *.log
 *.pot
 *.pyc
 local_settings.py
 sqlite3.exe
 GoonrakDB
+*~
