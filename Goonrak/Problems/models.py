@@ -23,7 +23,7 @@ class ProblemSet(models.Model):
   
 class ProblemSolveInfo(models.Model):
     timestamp = models.DateTimeField()
-    problem = models.ForeignKey(ProblemSet) # one to many(1:¡Ä) relation 
+    problem = models.ForeignKey(ProblemSet) # one to many(1:) relation
     
     #solver = models.ForeignKey(Account)
     is_breakthrough = models.BooleanField()
@@ -31,7 +31,7 @@ class ProblemSolveInfo(models.Model):
     
 '''
 Relation
-ProblemSet(1:¡Ä) <-----> ProblemSolveInfo <-------> (¡Ä : 1 ) Account    
+ProblemSet(1:) <-----> ProblemSolveInfo <-------> ( : 1 ) Account
 
 e.g
 
@@ -46,7 +46,7 @@ forensic300 ---   .....
 # corrspond to auth_method field!
 class ProblemAuthWithKey(models.Model): 
     problem = models.OneToOneField(ProblemSet)
-    answer_key = models.TextField();
+    answer_key = models.TextField()
 
 # corrspond to auth_method field!
 class ProblemAuthManually(models.Model):
